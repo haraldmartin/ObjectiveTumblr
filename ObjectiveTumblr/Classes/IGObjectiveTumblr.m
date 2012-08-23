@@ -57,7 +57,17 @@ NSString* const IGObjectiveTumblrApiBaseUrl = @"http://api.tumblr.com/v2";
 -(void) createPostWithHostName:(NSString*)hostName post:(IGPost*)post {
     NSString* url = [IGObjectiveTumblr urlWithPath:[NSString stringWithFormat:@"/blog/%@/post", hostName]];
     NSMutableDictionary* params = [post params];
+
+    // Remove, but save, the wanted photos in params[:data] to be re-added later
+    NSArray *photos = [params objectForKey:@"data"];
+    [params removeObjectForKey:@"data"];
     MKNetworkOperation* op = [self operationWithURLString:url params:params httpMethod:@"POST"];
+
+    // Add photos using addData:forKey:mimeType
+    [photos enumerateObjectsUsingBlock:^(NSData * photo, NSUInteger idx, BOOL *stop) {
+      [op addData:photo forKey:@"data"];
+    }];
+
     [op onCompletion:^(MKNetworkOperation *completedOperation) {
         if (self.delegate && [self.delegate respondsToSelector:@selector(tumblr:didFinishCreatePostWithHostname:)]) {
             [self.delegate tumblr:self didFinishCreatePostWithHostname:hostName];
