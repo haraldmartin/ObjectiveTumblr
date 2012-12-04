@@ -46,6 +46,9 @@ extern NSString* const IGObjectiveTumblrApiBaseUrl;
 // logout
 - (void)forgetStoredToken;
 
+// retrieve oauth token
+- (void)retrieveOAuthTokenFromKeychain;
+
 // request user info
 // GET api.tumblr.com/v2/user/info
 -(void) userInfo;
